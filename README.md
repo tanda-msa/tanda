@@ -25,7 +25,7 @@ Tanda(택시예약 시스템)
  
  
  ## 소스코드
-  https://github.com/tanda-ms 
+  https://github.com/tanda-msa
  
  ## 서비스 시나리오
  
