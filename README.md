@@ -3,7 +3,7 @@ Tanda(택시예약 시스템)
 본 시스템은 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성한 시스템입니다.
   
 ## Table of contents
----
+
  * 택시예약관리 시스템
   * 서비스 시나리오
   * 체크포인트
