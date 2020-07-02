@@ -165,6 +165,8 @@ Vary: Access-Control-Request-Headers
     "lastModifyTime": "2020-07-02T19:52:48.307"
 }
 ```
+* 각 서비스에서 메세지 Pub/Sub 전송
+
 
 
 
