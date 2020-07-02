@@ -22,11 +22,11 @@ Tanda(택시예약 시스템)
     * 무정지 재배포
     
  ## 택시예약관리 시스템
- ![tanda](https://user-images.githubusercontent.com/63759255/86345176-2b8d0580-bc96-11ea-9ef3-ea4deea04bfa.jpg)
+  ![탄다](https://user-images.githubusercontent.com/63759255/86345665-cc7bc080-bc96-11ea-9b94-c3ae43cef05a.jpg)
  
  
  ## 소스코드
-  https://github.com/tanda-ms
+  https://github.com/tanda-ms 
  
  ## 서비스 시나리오
  
