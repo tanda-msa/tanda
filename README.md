@@ -22,7 +22,7 @@ Tanda(택시예약 시스템)
     * 무정지 재배포
     
  ## 택시예약관리 시스템
- ![alt text](/test.png )
+ ![tanda](https://user-images.githubusercontent.com/63759255/86345176-2b8d0580-bc96-11ea-9ef3-ea4deea04bfa.jpg)
  
  
  ## 소스코드
