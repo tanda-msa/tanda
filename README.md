@@ -67,8 +67,106 @@ Tanda(택시예약 시스템)
 
  3. CORS
      - 예약 배차 관련 모든 상태 정보를 전달한다
+     
+## 분석/설계
+#### Event Storming 결과
 
-   
+* MSAEz 로 모델링한 이벤트스토밍 결과:
+_url 삽입 필요_
+
+#### 이벤트 도출
+_사진 삽입_
+
+#### 액터, 커맨드, 폴리시 부착
+_사진 삽입_
+
+#### 어그리게잇으로 묶기
+```
+  . Core Domain : 예약 , 차량관리
+  . Supporting Domain : CQRS
+  . General Domain : 결제  
+```
+  
+## 구현
+분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 파이선으로 구현하였다.
+구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다. (각자의 포트넘버는 8081 ~ 808n 이다)
+```
+# Book //port number: 8081
+
+# TaxiDeploy //port number: 8082
+
+# Pay //port number: 8083
+
+# CQRS //port number: 8084
+```
+
+각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다
+
+
+## 적용후 Test
+
+* 예약서비스에서 예약요청
+```
+http http://localhost:8081/books customerInfo="손흥민/010-1122-0015/1111-2222-3333-0015" departmentLoc="여의도" arrivalLoc="상도동" 
+Connection: keep-alive
+Content-Type: application/json
+Date: Thu, 02 Jul 2020 10:59:25 GMT
+Keep-Alive: timeout=60
+Location: http://localhost:8081/books/6
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_links": {
+        "book": {
+            "href": "http://localhost:8081/books/6"
+        },
+        "self": {
+            "href": "http://localhost:8081/books/6"
+        }
+    },
+    "arrivalLoc": "상도동",
+    "bookStatus": "접수됨",
+    "customerInfo": "손흥민/010-1122-0005/1111-2222-3333-0005",
+    "departmentLoc": "여의도",
+    "lastModifyTime": "2020-07-02T19:59:25.509"
+}
+```
+
+* 예약서비스에서 고객발 취소 요청
+```
+http patch localhost:8081/books/3 bookStatus="고객발 취소됨"
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Thu, 02 Jul 2020 10:52:48 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_links": {
+        "book": {
+            "href": "http://localhost:8081/books/3"
+        },
+        "self": {
+            "href": "http://localhost:8081/books/3"
+        }
+    },
+    "arrivalLoc": "마포2",
+    "bookStatus": "고객발 취소됨",
+    "customerInfo": "홍길동/010-2233-0002/1111-2222-3333-0002",
+    "departmentLoc": "김포",
+    "lastModifyTime": "2020-07-02T19:52:48.307"
+}
+```
+
+
+
 
 
 
