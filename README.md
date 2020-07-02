@@ -75,13 +75,9 @@ Tanda(택시예약 시스템)
 
 ![msaez](https://user-images.githubusercontent.com/63759255/86353261-eec70b80-bca1-11ea-9b01-cbe66009aa47.jpg)
 
-#### 이벤트 도출
+#### 이벤트 도출(액터, 커맨드, 폴리시 부착)
 
 ![이벤트스토밍](https://user-images.githubusercontent.com/63759255/86353291-fbe3fa80-bca1-11ea-9461-5f71c24e84ae.jpg)
-
-#### 액터, 커맨드, 폴리시 부착
-
-_사진 삽입_
 
 #### 어그리게잇으로 묶기
 ```
