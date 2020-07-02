@@ -186,9 +186,16 @@ Vary: Access-Control-Request-Headers
 
 ### CI/CD 설정
 
-내
+**Github , AWS CodePipeline , AWS EKS 연계 구성을 아래와 같은 단계로 수행**
 
-용
+* CREATE IAM ROLE
+* MODIFY AWS-AUTH CONFIGMAP
+* FORK SAMPLE REPOSITORY
+* GITHUB ACCESS TOKEN
+* CODEPIPELINE SETUP
+* TRIGGER NEW RELEASE
+* CLEANUP
+
 
 ### 서킷 브레이킹 / 장애격리
 
