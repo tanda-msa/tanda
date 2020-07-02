@@ -165,9 +165,9 @@ Vary: Access-Control-Request-Headers
     "lastModifyTime": "2020-07-02T19:52:48.307"
 }
 ```
-* 각 서비스에서 메세지 Pub/Sub 전송
+* 각 서비스에서 메세지 Pub/Sub 전송 확인
 
-
+![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
 
 
 
