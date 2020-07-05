@@ -243,11 +243,7 @@ payService.billRelease(pay);
 ![ridehistories](https://user-images.githubusercontent.com/63759255/86531662-24683080-befe-11ea-950a-fc6e8451fca8.PNG)
 * kakao 서비스 확인
 ![kakao](https://user-images.githubusercontent.com/63759255/86531660-23370380-befe-11ea-9069-788f0fc61d95.PNG)
-
-
->>>>>>> e03ddd56bef99d8e1dddc7155d60eefb81761f8a
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
-
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
 
 ### 동기식 호출 / 장애격리 / Eventual Consistency
