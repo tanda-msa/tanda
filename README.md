@@ -327,7 +327,63 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
+## 쿠버네티스 클러스터에 구축 내용
+* POD
+```
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/book-67bdcd9c85-8fjl4      1/1     Running   0          139m
+pod/book-67bdcd9c85-d9zjz      1/1     Running   0          139m
+pod/book-67bdcd9c85-npnfj      1/1     Running   0          138m
+pod/book-67bdcd9c85-wwm92      1/1     Running   0          138m
+pod/cqrs-85cd7575ff-r2kr6      1/1     Running   0          146m
+pod/cqrs-85cd7575ff-vp8s4      1/1     Running   0          146m
+pod/gateway-7668c7d7c8-5h5v2   1/1     Running   0          143m
+pod/gateway-7668c7d7c8-cgg7s   1/1     Running   0          143m
+pod/gateway-7668c7d7c8-ljkht   1/1     Running   0          143m
+pod/pay-8574d58dfd-6r47s       1/1     Running   0          132m
+pod/pay-8574d58dfd-947qg       1/1     Running   0          133m
+pod/pay-8574d58dfd-lg6mp       1/1     Running   0          133m
+pod/taxi-74559c9c9b-728fz      1/1     Running   1          76m
+pod/taxi-74559c9c9b-fv7l8      1/1     Running   0          76m
+pod/taxi-74559c9c9b-s72hr      1/1     Running   0          76m
+pod/taxi-74559c9c9b-vjjrp      1/1     Running   0          76m
+```
+* Service
+```
+NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP                                                                    PORT(S)        AGE
+service/book         ClusterIP      10.100.157.234   <none>                                                                         8081/TCP       3h5m
+service/cqrs         ClusterIP      10.100.185.213   <none>                                                                         8084/TCP       12h
+service/gateway      LoadBalancer   10.100.202.86    a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com   80:32378/TCP   2d9h
+service/kubernetes   ClusterIP      10.100.0.1       <none>                                                                         443/TCP        3d10h
+service/pay          ClusterIP      10.100.229.18    <none>                                                                         8083/TCP       177m
+service/taxi         ClusterIP      10.100.94.200    <none>                                                                         8082/TCP       76m
+```
+* Deployment와 Replica
+```
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/book      4/4     4            4           3h5m
+deployment.apps/cqrs      2/2     2            2           146m
+deployment.apps/gateway   3/3     3            3           2d9h
+deployment.apps/pay       3/3     3            3           177m
+deployment.apps/taxi      4/4     4            4           76m
 
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/book-67bdcd9c85      4         4         4       139m
+replicaset.apps/cqrs-85cd7575ff      2         2         2       146m
+replicaset.apps/gateway-7668c7d7c8   3         3         3       143m
+replicaset.apps/pay-5b78c86ffb       0         0         0       177m
+replicaset.apps/pay-8574d58dfd       3         3         3       133m
+replicaset.apps/taxi-74559c9c9b      4         4         4       76m
+```
+* Autoscaler
+```
+NAME                                          REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/book      Deployment/book      <unknown>/50%   3         20        4          3h5m
+horizontalpodautoscaler.autoscaling/cqrs      Deployment/cqrs      <unknown>/50%   1         10        2          12h
+horizontalpodautoscaler.autoscaling/gateway   Deployment/gateway   <unknown>/50%   2         10        3          143m
+horizontalpodautoscaler.autoscaling/pay       Deployment/pay       <unknown>/50%   2         20        3          177m
+horizontalpodautoscaler.autoscaling/taxi      Deployment/taxi      <unknown>/50%   3         20        4          76m
+```
 ## 운영
 
 ### CI/CD 설정
