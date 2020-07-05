@@ -237,27 +237,6 @@ payService.billRelease(pay);
 ![택시요청db2](https://user-images.githubusercontent.com/63759255/86531259-ab1b0e80-befa-11ea-83b4-d493ae9547f0.png)
 <<<<<<< HEAD
 ![택시취소DB](https://user-images.githubusercontent.com/63759255/86531821-79587680-beff-11ea-87fd-185e74690eb2.png)
-
-<<<<<<< HEAD
-=======
-{
-    "_links": {
-        "book": {
-            "href": "http://localhost:8081/books/3"
-        },
-        "self": {
-            "href": "http://localhost:8081/books/3"
-        }
-    },
-    "arrivalLoc": "마포2",
-    "bookStatus": "고객발 취소됨",
-    "customerInfo": "홍길동/010-2233-0002/1111-2222-3333-0002",
-    "departmentLoc": "김포",
-    "lastModifyTime": "2020-07-02T19:52:48.307"
-}
-```
-=======
->>>>>>> f8305ea0100b37d8f454422279242c7b1e5f3ce4
 * 취소처리 확인
 ![취소처리1](https://user-images.githubusercontent.com/63759255/86531336-53c96e00-befb-11ea-8ea4-922cfbdec305.PNG)
 * CQRS 확인
