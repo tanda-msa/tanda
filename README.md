@@ -31,14 +31,7 @@ Tanda(택시예약 시스템)
  
  
  ## 소스코드
-  | No | Service Name| Github Address |
-  | :--------: | :--------: | :--------: |
-  | 0 | Readme | https://github.com/tanda-msa |
-  | 1 | gateway | https://github.com/jamesby99/gateway.git | 
-  | 2 | book | https://github.com/one7ime/book.git | 8081 | 
-  | 3 | taxi | https://github.com/choijuho/taxi.git | 8082 | 
-  | 4 | pay | https://github.com/choijuho/taxi.git | 8083 | 
-  | 5 | cqrs | https://github.com/jamesby99/cqrs.git | 8084 | 
+  https://github.com/tanda-msa
  
  ## 서비스 시나리오
  
@@ -78,9 +71,6 @@ Tanda(택시예약 시스템)
 
  3. CORS
      - 예약 배차 관련 모든 상태 정보를 전달한다
-  
-  #### 사용자 UI (예상 Sample)
-  ![Taxi 호출 UI](https://user-images.githubusercontent.com/63759255/86532481-487b4000-bf05-11ea-968c-ab934e3b1c55.png)
      
 ## 분석/설계
 
@@ -189,43 +179,7 @@ public class Pay {
 
 ![업무 프로세스 흐름도 ](https://user-images.githubusercontent.com/63759255/86529658-5755f880-beed-11ea-94a0-dd9e516a10d4.png)
 
-### Saga Patter 적용(비기능요구사항-1,3 트랜젝션 )
-   ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
-### Feign Client 구현(비기능요구사항-2,3 장애격리)  
-#### 1. dependency 추가(pom.xml)
-```xml
-<dependency>
-<groupId>org.springframework.cloud</groupId>
-<artifactId>spring-cloud-starter-openfeign</artifactId>
-</dependency>
- ```    
-#### 2. FeignClient Enabling(App.java)
-```java
-@EnableFeignClients
-public class App {
-```    
-#### 3. FeignClient 인터페이스 생성(PayService.java) 
-```java
-@FeignClient(name = "pay", url = "${api.url.pay}")
-public interface PayService {
-@RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
-void billRelease(Pay pay);
-}
-```    
-#### 4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
-```java
-Pay pay = new Pay();
-pay.setBookId(f.getBookId()); 
-pay.setDispatchId(f.getDispatchId());
-pay.setPrice(this.getPrice()); 
-try {
-PayService payService = App.applicationContext.getBean(PayService.class);
-payService.billRelease(pay);					
-} catch (Exception e) {
-    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
-}
-```
 ### 폴리글랏 프로그래밍
 | No | Service Name| db | skill stack | etc |
 | :--------: | :--------: | :--------: | :-------- | :-------- |
@@ -293,11 +247,43 @@ data:
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
 
 ### 동기식 호출 / 장애격리 / Eventual Consistency
+####Saga Patter 적용(비기능요구사항-1,3 트랜젝션 )
+   ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
-추
-
-작
-성
+#### Feign Client 구현(비기능요구사항-2,3,4 장애격리, Request-response구현)  
+##### 1. dependency 추가(pom.xml)
+```xml
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+ ```    
+##### 2. FeignClient Enabling(App.java)
+```java
+@EnableFeignClients
+public class App {
+```    
+##### 3. FeignClient 인터페이스 생성(PayService.java) 
+```java
+@FeignClient(name = "pay", url = "${api.url.pay}")
+public interface PayService {
+@RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
+void billRelease(Pay pay);
+}
+```    
+##### 4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
+```java
+Pay pay = new Pay();
+pay.setBookId(f.getBookId()); 
+pay.setDispatchId(f.getDispatchId());
+pay.setPrice(this.getPrice()); 
+try {
+PayService payService = App.applicationContext.getBean(PayService.class);
+payService.billRelease(pay);					
+} catch (Exception e) {
+    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
+}
+```
 
 ## 운영
 
