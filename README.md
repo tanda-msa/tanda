@@ -387,37 +387,251 @@ horizontalpodautoscaler.autoscaling/taxi      Deployment/taxi      <unknown>/50%
 ## 운영
 
 ### CI/CD 설정
+Github, Maven Build, Dockerlize, Kubernetes 배포의 전과정을 직접 익힐 수 있도록 Dockerfile과 Kubernetes yml 파일을 직접 작성하고 이를 자동으로 일괄 수행되도록 리눅스 쉡스크립트를 작성하여 CI/CD를 구현하였다.
+* 작성한 쉡스립트 ( cicd.sh )
+```
+#!/bin/sh
 
-**Github , AWS CodePipeline , AWS EKS 연계 구성을 아래와 같은 단계로 수행**
+_MSA='taxi'
+_GIT_HUB='https://github.com/choijuho/taxi.git'
 
-* CREATE IAM ROLE
-* MODIFY AWS-AUTH CONFIGMAP
-* FORK SAMPLE REPOSITORY
-* GITHUB ACCESS TOKEN
-* CODEPIPELINE SETUP
-* TRIGGER NEW RELEASE
-* CLEANUP
+echo "${_MSA}의 CI/CD 작업을 시작합니다."
 
+echo "[1단계]: 기존 소스 삭제 및 git clone..."
+echo "> git주소: ${_GIT_HUB}"
+rm -rf ./${_MSA}
+git clone ${_GIT_HUB} > ./logs/${_MSA}-git.log 2>&1
+
+cd ./${_MSA}
+
+echo "[2단계]: maven package 작업 중..."
+mvn clean > ../logs/${_MSA}-mvn-clean.log 2>&1
+mvn package > ../logs/${_MSA}-mvn-package.log 2>&1
+
+echo "[3단계]: docker build&push 작업 중..."
+echo "> build image name: jamesby99/${_MSA}:latest"
+docker build -t jamesby99/${_MSA}:latest . > ../logs/${_MSA}-docker-build.log 2>&1
+docker push jamesby99/${_MSA}:latest
+
+echo "[4단계]: 변경사항을 kubernetes에 반영합니다."
+kubectl apply -f ${_MSA}.yml
+
+echo "${_MSA}의 CI/CD 작업이 완료되었습니다."
+``` 
+* 수행결과
+```
+ubuntu@ip-172-31-15-195:~/tanda/taxi$ ./cicd.sh
+taxi의 CI/CD 작업을 시작합니다.
+[1단계]: 기존 소스 삭제 및 git clone...
+> git주소: https://github.com/choijuho/taxi.git
+[2단계]: maven package 작업 중...
+[3단계]: docker build&push 작업 중...
+> build image name: jamesby99/taxi:latest
+The push refers to repository [docker.io/jamesby99/taxi]
+6ee47f0f3a68: Pushed
+ceaf9e1ebef5: Layer already exists
+9b9b7f3d56a0: Layer already exists
+f1b5933fe4b5: Layer already exists
+latest: digest: sha256:bcd2c84fa21d06bd72d00baf03eedd20b5391026aa14bc4973715d7356014258 size: 1159
+[4단계]: 변경사항을 kubernetes에 반영합니다.
+deployment.apps/taxi created
+service/taxi created
+horizontalpodautoscaler.autoscaling/taxi created
+taxi의 CI/CD 작업이 완료되었습니다.   
+```
 
 ### 서킷 브레이킹 / 장애격리
+서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용
+* 동기 수신단에서는 처리후 아래와 같은 랜덤 지연 부하를 만들어줌
+```
+	@PostPersist
+	protected void payAccepted() throws InterruptedException {
+		PayRepository repository = App.applicationContext.getBean(PayRepository.class);
 
-내
+		repository.findById(payId).ifPresent(f -> {
+			BillIssued bi = new BillIssued();
+			bi.setPayId(f.getPayId());
+			bi.setDispatchId(f.getDispatchId());
+			bi.setBookId(f.getBookId());
+			bi.setPrice(f.getPrice());
+			bi.setLastModifyTime(f.getLastModifyTime());
+			KafkaSender.pub(bi);
+		});
+		
+        try {
+            Thread.sleep((long) (400 + Math.random() * 220));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+		
 
-
-용
+	}
+```
+* FeignClient + Hystrix 형태로 구성된 interface가 호출될 수 있도록 API Call 구성하여 테스트
+```
+siege -c255 -t60S -r10 --content-type "application/json" 'a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxiDispatches/1 PATCH {"dispatchStatus":"운행종료됨", "price":"10000"}'
+```
+* Failed transactions: 43건과 Longest transaction: 32.30이나 서킷 브레이크 동작으로 준수한 성공률 유지
+```
+[error] CONFIG conflict: selected time and repetition based testing
+defaulting to time-based testing: 60 seconds
+** SIEGE 4.0.4
+** Preparing 255 concurrent users for battle.
+The server is now under siege...
+Lifting the server siege...
+Transactions:                   1883 hits
+Availability:                  97.77 %
+Elapsed time:                  59.08 secs
+Data transferred:               0.86 MB
+Response time:                  7.08 secs
+Transaction rate:              31.87 trans/sec
+Throughput:                     0.01 MB/sec
+Concurrency:                  225.55
+Successful transactions:        1883
+Failed transactions:              43
+Longest transaction:           32.30
+Shortest transaction:           0.41
+```
 
 ### 오토스케일 아웃
+* 부하에 오토스케일을 확인하기 위해 아래 1개 POD로부터 시작하며, 최대 20개 POD까지 증가되도록 구성
+```
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/book-67bdcd9c85-d9zjz      1/1     Running   0          4h8m
 
-내
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/book      1/1     1            1           4h55m
 
-용
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/book-67bdcd9c85      1         1         1       4h8m
 
+NAME                                          REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/book      Deployment/book      <unknown>/10%   1         20        1          4h55m
+```
+* 부하 명령어
+```
+siege -c255 -t240S -r10 --content-type "application/json" 'a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/books POST {"customerInfo="박성홍/010-1122-0001/1111-2222-3333-0001","departmentLoc":"김포","arrivalLoc":"마포" }'     
+[error] CONFIG conflict: selected time and repetition based testing
+```
+* Replica 변화 측정하였으나, 부하가 부족했는지 아니면 비동기 방식의 마이크로서비스의 성능이 좋아서 그런지 오토스케일은 확인하지 못함. 동기식대비 수십배 트랙잭션 수용
+```
+k get deploy book -w
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+book   1/1     1            1           4h58m
+```
+```
+Lifting the server siege...
+Transactions:                  96386 hits
+Availability:                  99.99 %
+Elapsed time:                 239.92 secs
+Data transferred:              54.33 MB
+Response time:                  0.62 secs
+Transaction rate:             401.74 trans/sec
+Throughput:                     0.23 MB/sec
+Concurrency:                  250.38
+Successful transactions:           0
+Failed transactions:              14
+Longest transaction:           30.29
+Shortest transaction:           0.00
+```
 ### 무정지 재배포
+* 5개 POD로 먼저 구성하고, docker image가 변경되도록 하여 재배포를 수행한다. 이때 부하를 줌으로써 서비스영향을 측정한다.
+```
+ubuntu@ip-172-31-15-195:~/tanda/book$ k get po
+NAME                       READY   STATUS    RESTARTS   AGE
+book-67bdcd9c85-2qpbw      1/1     Running   0          59s
+book-67bdcd9c85-d7ljl      1/1     Running   0          59s
+book-67bdcd9c85-kllqq      1/1     Running   0          59s
+book-67bdcd9c85-ph7m5      1/1     Running   0          59s
+book-67bdcd9c85-wcsp5      1/1     Running   0          59s
+```
+* 해당 서비스의 yml에는 livenessProbe와 readinessProbe가 동작되도록 반영하였다.
+```
+      containers:
+      - name: book
+        image: jamesby99/book:latest
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 2            
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 5
+          timeoutSeconds: 1                      
 
-내
-
-용
-
-
-
- 
+```
+* 미미한 일부 유실이 있었지만, 안정적으로 배포가 수행됨을 확인하였다. 
+```
+Lifting the server siege...
+Transactions:                  97556 hits
+Availability:                  99.96 %
+Elapsed time:                 239.25 secs
+Data transferred:              54.99 MB
+Response time:                  0.57 secs
+Transaction rate:             407.76 trans/sec
+Throughput:                     0.23 MB/sec
+Concurrency:                  233.72
+Successful transactions:           0
+Failed transactions:              36
+Longest transaction:           31.06
+Shortest transaction:           0.00
+```
+### Configmap과 Secret 반영
+모두 마이크로서비스에는 Configmap를 구성하여 외부 주입에 의한 Pod운영의 유연성을 확보하였다.
+* DB주소와 Table스페이스 ConfigMap 예
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cqrs-cm
+data:
+  db-address: 3.34.223.233:3306
+  db-table-sapce: db_tanda_cqrs
+```
+* user id와 password Secrets 예
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cqrs-secret
+data:
+  db-user: dGFuZGFjcXJzCg==
+  db-pw: dGFuZGEyMDIwCg==
+```
+* 적용 yaml (예: CQRS 일부 발췌)
+```
+        env:
+        - name: _DATASOURCE_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+               name: cqrs-cm
+               key: db-address
+        - name: _DATASOURCE_TABLESPACE
+          valueFrom:
+            configMapKeyRef:
+               name: cqrs-cm
+               key: db-table-sapce
+        - name: _DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+               name: cqrs-secret
+               key: db-user
+        - name: _DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+               name: cqrs-secret
+               key: db-pw
+```
+* 적용 applicaion.property (예: CQRS 일부 발췌)
+```
+  datasource:
+    url: jdbc:mysql://${_DATASOURCE_ADDRESS:localhost:3306}/${_DATASOURCE_TABLESPACE:db_tanda_cqrs}?autoReconnect=true&serverTimezone=JST
+    username: ${_DATASOURCE_USERNAME}
+    password: ${_DATASOURCE_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver   
+```
