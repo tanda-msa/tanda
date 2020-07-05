@@ -157,7 +157,7 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
-### 적용후 Test(Sample)
+### 적용후 Test(AWS)
 
 * 예약서비스에서 예약요청
 ```
@@ -189,183 +189,15 @@ Vary: Access-Control-Request-Headers
 }
 ```
 * 택시 배차요청 수신 확인
-```
-http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi
-{
-  "_embedded" : {
-    "taxiDispatches" : [ {
-      "bookId" : 1,
-      "taxiInfo" : null,
-      "dispatchStatus" : "배차중",
-      "price" : 0,
-      "lastModifyTime" : "2020-07-05T17:14:40.831",
-      "_links" : {
-        "self" : {
-          "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch" : {
-          "href" : "a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-      }
-    } ]
-  },
-  "_links" : {
-    "self" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    },
-    "profile" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    },
-    "search" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    }
-  },
-  "page" : {
-    "size" : 20,
-    "totalElements" : 1,
-    "totalPages" : 1,
-    "number" : 0
-  }
-}
-```
+![배차됨2](https://user-images.githubusercontent.com/63759255/86531267-b8d09400-befa-11ea-877d-25581c1232a2.png)
 * 배차 완료
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 taxiInfo="30우8281/010-0000-0000" dispatchStatus="배차됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:26:07 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "배차됨",
-    "lastModifyTime": "2020-07-05T17:26:07.538",
-    "price": 0,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
+![배차중2](https://user-images.githubusercontent.com/63759255/86531268-ba01c100-befa-11ea-82d8-8f432ff3dcab.png)
 * 운행 시작
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행시작됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:30:40 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "운행시작됨",
-    "lastModifyTime": "2020-07-05T17:30:40.027",
-    "price": 0,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
+![운행시작2](https://user-images.githubusercontent.com/63759255/86531269-ba9a5780-befa-11ea-878d-c274c2310a2e.png)
 * 운행 종료
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행종료됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:33:53 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "운행종료됨",
-    "lastModifyTime": "2020-07-05T17:33:53.939",
-    "price": 5000,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
+![운행완료2](https://user-images.githubusercontent.com/63759255/86531271-ba9a5780-befa-11ea-8f48-3e4793db79ed.png)
 * 결제확인
-```
-http http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/hal+json
-Date: Sun, 05 Jul 2020 08:45:16 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_embedded": {
-        "pays": [
-            {
-                "_links": {
-                    "pay": {
-                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
-                    },
-                    "self": {
-                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
-                    }
-                },
-                "bookId": 1,
-                "dispatchId": 1,
-                "lastModifyTime": "2020-07-05T17:42:30.845",
-                "price": 5000
-            }
-        ]
-    },
-    "_links": {
-        "profile": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
-        },
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
-        }
-    },
-    "page": {
-        "number": 0,
-        "size": 20,
-        "totalElements": 1,
-        "totalPages": 1
-    }
-}
-```
+![페이처리2](https://user-images.githubusercontent.com/63759255/86531272-bb32ee00-befa-11ea-9c3b-bf1c290015f4.png)
 * 예약서비스에서 고객발 취소 요청
 ```
 http patch localhost:8081/books/3 bookStatus="고객발 취소됨"
