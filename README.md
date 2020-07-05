@@ -57,19 +57,19 @@ Tanda(택시예약 시스템)
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
      - 구현(taxi 서비스)  
   a. dependency 추가(pom.xml)
-```
-<dependency>
-<groupId>org.springframework.cloud</groupId>
-<artifactId>spring-cloud-starter-openfeign</artifactId>
-</dependency>
-```    
+  ```
+  <dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-openfeign</artifactId>
+  </dependency>
+  ```    
    b. FeignClient Enabling(App.java)
-```
-@SpringBootApplication
-@EnableBinding(Processor.class)
-@EnableFeignClients
-public class App {
-```    
+  ```
+  @SpringBootApplication
+  @EnableBinding(Processor.class)
+  @EnableFeignClients
+  public class App {
+  ```    
    c. FeignClient 인터페이스 생성(PayService.java) 
 ```
 @FeignClient(name = "pay", url = "${api.url.pay}")
