@@ -55,6 +55,42 @@ Tanda(택시예약 시스템)
   2. 장애격리
      - 결제시스템(Sync연동)이 과중되면 Circuit breaker(FeignClient, Hystrix) 동작 및 운행종료(fallback)로 넘어가지 않는다.
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
+     - 구현(taxi 서비스)
+      a. dependency 추가(pom.xml)
+      ```
+    <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+      ```
+      b. FeignClient Enabling(App.java)
+      ```
+    @SpringBootApplication
+    @EnableBinding(Processor.class)
+    @EnableFeignClients
+    public class App {
+      ```
+      c. FeignClient 인터페이스 생성(PayService.java)
+      ```
+    @FeignClient(name = "pay", url = "${api.url.pay}")
+    public interface PayService {
+	  @RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
+	  void billRelease(Pay pay);
+	  }
+      ```
+      d. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)
+      ```
+    Pay pay = new Pay();
+    pay.setBookId(f.getBookId());  // 검색
+    pay.setDispatchId(f.getDispatchId());
+    pay.setPrice(this.getPrice());// API 입력
+    try {
+    PayService payService = App.applicationContext.getBean(PayService.class);
+    payService.billRelease(pay);					
+    } catch (Exception e) {
+    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
+    }
+      ```
   3. 성능 
      - 서포트 기능(CPQR) 이 수행되지 않더라도 차량 요청 및 배차는 365일 24시간 받을 수 있어야 한다      Async (event-driven), Eventual Consistency
      - 가용한 차량이 없으면 사용자를 잠시동안 받지 않고 잠시후에 호출하도록 유도 (circuit breaker)
