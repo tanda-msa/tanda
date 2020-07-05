@@ -51,54 +51,14 @@ Tanda(택시예약 시스템)
  
   1. 트랜잭션
    고객 배차 취소 요청은 비동기 방식이나, Saga Pattern을 적용하여 최종 일관성을 유지한다.  
-   ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
   2. 장애격리
      - 결제시스템(Sync연동)이 과중되면 Circuit breaker(FeignClient, Hystrix) 동작 및 운행종료(fallback)로 넘어가지 않는다.
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
-     - 구현(taxi 서비스)  
-  a. dependency 추가(pom.xml)
-  ```
-  <dependency>
-  <groupId>org.springframework.cloud</groupId>
-  <artifactId>spring-cloud-starter-openfeign</artifactId>
-  </dependency>
-  ```    
-   b. FeignClient Enabling(App.java)
-  ```
-  @SpringBootApplication
-  @EnableBinding(Processor.class)
-  @EnableFeignClients
-  public class App {
-  ```    
-   c. FeignClient 인터페이스 생성(PayService.java) 
-```
-@FeignClient(name = "pay", url = "${api.url.pay}")
-public interface PayService {
-@RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
-void billRelease(Pay pay);
-}
-```    
-   d. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
-```
-Pay pay = new Pay();
-pay.setBookId(f.getBookId()); 
-pay.setDispatchId(f.getDispatchId());
-pay.setPrice(this.getPrice()); 
-try {
-PayService payService = App.applicationContext.getBean(PayService.class);
-payService.billRelease(pay);					
-} catch (Exception e) {
-    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
-}
-```
-
+     - 구현(taxi 서비스)
   3. 성능 
      - 서포트 기능(CPQR) 이 수행되지 않더라도 차량 요청 및 배차는 365일 24시간 받을 수 있어야 한다      Async (event-driven), Eventual Consistency
      - 가용한 차량이 없으면 사용자를 잠시동안 받지 않고 잠시후에 호출하도록 유도 (circuit breaker)
      - 차량운행 상태의 변경시 알림을 준다 (Event driven)
-        1. 배차(비가용)
-        2. 운행시작(비가용)
-        3. 운행종료(가용)
   4. 기타
      - 결제(Sync) 외 비동기
    
@@ -202,7 +162,7 @@ public class Pay {
 
 ----------------------------------------------------------
 ### 헥사고날 다이어그램
-![헥사고날 다이어그램](https://user-images.githubusercontent.com/63759255/86528326-e5c47d00-bee1-11ea-95cc-2e56b8df17c3.png)
+![헥사고날 다이어그램2](https://user-images.githubusercontent.com/63759255/86530692-c6cfe600-bef5-11ea-8124-c9a75d0c2889.png)
 
   
 ## 구현(github 소스 참고)
@@ -228,195 +188,85 @@ public class Pay {
 
 ![업무 프로세스 흐름도 ](https://user-images.githubusercontent.com/63759255/86529658-5755f880-beed-11ea-94a0-dd9e516a10d4.png)
 
+### SagaPatter 적용(비기능요구사항-1,3 트랜젝션 )
+   ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
-### 적용후 Test(Sample)
+### Feign Client 구현(비기능요구사항-2,3 장애격리)  
+#### 1. dependency 추가(pom.xml)
+```xml
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+ ```    
+#### 2. FeignClient Enabling(App.java)
+```java
+@EnableFeignClients
+public class App {
+```    
+#### 3. FeignClient 인터페이스 생성(PayService.java) 
+```java
+@FeignClient(name = "pay", url = "${api.url.pay}")
+public interface PayService {
+@RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
+void billRelease(Pay pay);
+}
+```    
+#### 4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
+```java
+Pay pay = new Pay();
+pay.setBookId(f.getBookId()); 
+pay.setDispatchId(f.getDispatchId());
+pay.setPrice(this.getPrice()); 
+try {
+PayService payService = App.applicationContext.getBean(PayService.class);
+payService.billRelease(pay);					
+} catch (Exception e) {
+    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
+}
+```
+### 적용후 Test(AWS)
 
 * 예약서비스에서 예약요청
 ![택시요청](https://user-images.githubusercontent.com/63759255/86531256-a35b6a00-befa-11ea-9a91-0b4613d1cc4d.png)
 ![택시요청db1](https://user-images.githubusercontent.com/63759255/86531307-12d15980-befb-11ea-8eb5-2f801722fbf4.png)
 
 * 택시 배차요청 수신 확인
-```
-http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi
-{
-  "_embedded" : {
-    "taxiDispatches" : [ {
-      "bookId" : 1,
-      "taxiInfo" : null,
-      "dispatchStatus" : "배차중",
-      "price" : 0,
-      "lastModifyTime" : "2020-07-05T17:14:40.831",
-      "_links" : {
-        "self" : {
-          "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch" : {
-          "href" : "a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-      }
-    } ]
-  },
-  "_links" : {
-    "self" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    },
-    "profile" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    },
-    "search" : {
-      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
-    }
-  },
-  "page" : {
-    "size" : 20,
-    "totalElements" : 1,
-    "totalPages" : 1,
-    "number" : 0
-  }
-}
-```
-* 배차 완료
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 taxiInfo="30우8281/010-0000-0000" dispatchStatus="배차됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:26:07 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "배차됨",
-    "lastModifyTime": "2020-07-05T17:26:07.538",
-    "price": 0,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
-* 운행 시작
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행시작됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:30:40 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "운행시작됨",
-    "lastModifyTime": "2020-07-05T17:30:40.027",
-    "price": 0,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
-* 운행 종료
-```
-http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행종료됨"
-
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Sun, 05 Jul 2020 08:33:53 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_links": {
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        },
-        "taxiDispatch": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
-        }
-    },
-    "bookId": 1,
-    "dispatchStatus": "운행종료됨",
-    "lastModifyTime": "2020-07-05T17:33:53.939",
-    "price": 5000,
-    "taxiInfo": "30우8281/010-0000-0000"
-}
-```
+![배차됨2](https://user-images.githubusercontent.com/63759255/86531267-b8d09400-befa-11ea-877d-25581c1232a2.png)
+* 배차 완료 확인
+![배차중2](https://user-images.githubusercontent.com/63759255/86531268-ba01c100-befa-11ea-82d8-8f432ff3dcab.png)
+* 운행 시작 확인
+![운행시작2](https://user-images.githubusercontent.com/63759255/86531269-ba9a5780-befa-11ea-878d-c274c2310a2e.png)
+* 운행 종료 확인
+![운행완료2](https://user-images.githubusercontent.com/63759255/86531271-ba9a5780-befa-11ea-8f48-3e4793db79ed.png)
 * 결제확인
-```
-http http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/hal+json
-Date: Sun, 05 Jul 2020 08:45:16 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-
-{
-    "_embedded": {
-        "pays": [
-            {
-                "_links": {
-                    "pay": {
-                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
-                    },
-                    "self": {
-                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
-                    }
-                },
-                "bookId": 1,
-                "dispatchId": 1,
-                "lastModifyTime": "2020-07-05T17:42:30.845",
-                "price": 5000
-            }
-        ]
-    },
-    "_links": {
-        "profile": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
-        },
-        "self": {
-            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
-        }
-    },
-    "page": {
-        "number": 0,
-        "size": 20,
-        "totalElements": 1,
-        "totalPages": 1
-    }
-}
-```
+![페이처리2](https://user-images.githubusercontent.com/63759255/86531272-bb32ee00-befa-11ea-9c3b-bf1c290015f4.png)
 * 예약서비스에서 고객발 취소 요청
 ![택시취소](https://user-images.githubusercontent.com/63759255/86531266-b79f6700-befa-11ea-8a1c-01e96a16c9c3.png)
 ![택시요청db2](https://user-images.githubusercontent.com/63759255/86531259-ab1b0e80-befa-11ea-83b4-d493ae9547f0.png)
 
+<<<<<<< HEAD
+=======
+{
+    "_links": {
+        "book": {
+            "href": "http://localhost:8081/books/3"
+        },
+        "self": {
+            "href": "http://localhost:8081/books/3"
+        }
+    },
+    "arrivalLoc": "마포2",
+    "bookStatus": "고객발 취소됨",
+    "customerInfo": "홍길동/010-2233-0002/1111-2222-3333-0002",
+    "departmentLoc": "김포",
+    "lastModifyTime": "2020-07-02T19:52:48.307"
+}
+```
+* 취소처리 확인
+![취소처리1](https://user-images.githubusercontent.com/63759255/86531336-53c96e00-befb-11ea-8ea4-922cfbdec305.PNG)
+
+>>>>>>> e03ddd56bef99d8e1dddc7155d60eefb81761f8a
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
 
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
