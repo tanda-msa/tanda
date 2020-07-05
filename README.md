@@ -235,10 +235,13 @@ payService.billRelease(pay);
 * 예약서비스에서 고객발 취소 요청
 ![택시취소](https://user-images.githubusercontent.com/63759255/86531266-b79f6700-befa-11ea-8a1c-01e96a16c9c3.png)
 ![택시요청db2](https://user-images.githubusercontent.com/63759255/86531259-ab1b0e80-befa-11ea-83b4-d493ae9547f0.png)
-
-
 * 취소처리 확인
 ![취소처리1](https://user-images.githubusercontent.com/63759255/86531336-53c96e00-befb-11ea-8ea4-922cfbdec305.PNG)
+* CQRS 확인
+![ridehistories](https://user-images.githubusercontent.com/63759255/86531662-24683080-befe-11ea-950a-fc6e8451fca8.PNG)
+* kakao 서비스 확인
+![kakao](https://user-images.githubusercontent.com/63759255/86531660-23370380-befe-11ea-9069-788f0fc61d95.PNG)
+
 
 >>>>>>> e03ddd56bef99d8e1dddc7155d60eefb81761f8a
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
