@@ -80,7 +80,7 @@ Tanda(택시예약 시스템)
  2. 차량 운행 서비스 (Taxideploy)
      - 모든 요청에 대해 1분이내 배차/재요청 응답한다.
 
- 3. CQRS
+ 3. CORS
      - 예약 배차 관련 모든 상태 정보를 전달한다
      
 ## 분석/설계
@@ -258,7 +258,7 @@ data:
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
 
 ### 동기식 호출 / 장애격리 / Eventual Consistency
-####Saga Patter 적용(비기능요구사항-1,3 트랜젝션 )
+#### Saga Patter 적용(비기능요구사항-1,3 트랜젝션 )
    ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
 #### Feign Client 구현(비기능요구사항-2,3,4 장애격리, Request-response구현)  
