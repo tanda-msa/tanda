@@ -68,7 +68,7 @@ Tanda(택시예약 시스템)
      - 가용한 차량이 없으면 사용자를 잠시동안 받지 않고 잠시후에 호출하도록 유도 (circuit breaker)
      - 차량운행 상태의 변경시 알림을 준다 (Event driven)
   4. 기타
-     - 결제(Sync) 외 비동기
+     - 결제(Sync) 외 비동기, 운영의 유연성 및 안전성 확보(ConfigMap, Secrets)
    
  ###  KPI 
   1. 예약 서비스(book)
@@ -330,6 +330,40 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
+## Gateway를 외부에서 클러스터내 마이크로 서비스 API 호출 구현
+```
+spring:
+  profiles: docker
+  cloud:
+    gateway:
+      routes:
+        - id: book
+          uri: http://book:8081
+          predicates:
+            - Path=/books/**
+        - id: taxi
+          uri: http://taxi:8082
+          predicates:
+            - Path=/taxiDispatches/**
+        - id: pay
+          uri: http://pay:8083
+          predicates:
+            - Path=/pays/**
+        - id: CQRS
+          uri: http://cqrs:8084
+          predicates:
+            - Path=/rideHistories/**, /kakaos/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+```
 ## 쿠버네티스 클러스터에 구축 내용
 * POD
 ```
@@ -374,7 +408,6 @@ NAME                                 DESIRED   CURRENT   READY   AGE
 replicaset.apps/book-67bdcd9c85      4         4         4       139m
 replicaset.apps/cqrs-85cd7575ff      2         2         2       146m
 replicaset.apps/gateway-7668c7d7c8   3         3         3       143m
-replicaset.apps/pay-5b78c86ffb       0         0         0       177m
 replicaset.apps/pay-8574d58dfd       3         3         3       133m
 replicaset.apps/taxi-74559c9c9b      4         4         4       76m
 ```
@@ -514,7 +547,6 @@ horizontalpodautoscaler.autoscaling/book      Deployment/book      <unknown>/10%
 * 부하 명령어
 ```
 siege -c255 -t240S -r10 --content-type "application/json" 'a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/books POST {"customerInfo="박성홍/010-1122-0001/1111-2222-3333-0001","departmentLoc":"김포","arrivalLoc":"마포" }'     
-[error] CONFIG conflict: selected time and repetition based testing
 ```
 * Replica 변화 측정하였으나, 부하가 부족했는지 아니면 비동기 방식의 마이크로서비스의 성능이 좋아서 그런지 오토스케일은 확인하지 못함. 동기식대비 수십배 트랙잭션 수용
 ```
@@ -523,7 +555,6 @@ NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 book   1/1     1            1           4h58m
 ```
 ```
-Lifting the server siege...
 Transactions:                  96386 hits
 Availability:                  99.99 %
 Elapsed time:                 239.92 secs
@@ -570,7 +601,6 @@ book-67bdcd9c85-wcsp5      1/1     Running   0          59s
 ```
 * 미미한 일부 유실이 있었지만, 안정적으로 배포가 수행됨을 확인하였다. 
 ```
-Lifting the server siege...
 Transactions:                  97556 hits
 Availability:                  99.96 %
 Elapsed time:                 239.25 secs
