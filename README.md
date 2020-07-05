@@ -216,6 +216,42 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
+### 폴리글랏 프로그래밍
+| No | Service Name| db | skill stack | etc |
+| :--------: | :--------: | :--------: | :-------- | :-------- |
+| 1 | gateway | mysql | Spring gateway |  |
+| 2 | book | H2 | Spring, JPA, Lombok |  |
+| 3 | taxi | mysql | Spring, JPA, Lombok, openfeign |   |
+| 4 | pay | mysql | Spring, JPA, Lombok |  |
+| 5 | cqrs | mysql | Spring, JPA, Lombok |  |
+#### H2 DB application.properties
+```yml
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://${_DATASOURCE_ADDRESS}/${_DATASOURCE_TABLESPACE}
+    username: ${_DATASOURCE_USERNAME}
+    password: ${_DATASOURCE_PASSWORD}  
+```
+#### H2 DB application.properties
+```yml
+  datasource:
+    url: jdbc:mysql://${_DATASOURCE_ADDRESS}/${_DATASOURCE_TABLESPACE}?autoReconnect=true&serverTimezone=JST&useUnicode=true&characterEncoding=UTF-8
+    username: ${_DATASOURCE_USERNAME}
+    userpassword: ${_DATASOURCE_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver
+```
+#### 보안을 위한 Kubernetes secret properties (secret.yml)
+```yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cqrs-secret
+data:
+  db-user: dGFuZGFjcXJzCg==
+  db-pw: dGFuZGEyMDIwCg==
+```
+
+
 ### 적용후 Test(AWS k8s 환경에서 시험)
 
 * 예약서비스에서 예약요청
