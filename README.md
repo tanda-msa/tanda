@@ -97,6 +97,10 @@ Tanda(택시예약 시스템)
   . Supporting Domain : CQRS
   . General Domain : 결제  
 ```
+
+### 헥사고날 다이어그램
+![헥사고날 다이어그램](https://user-images.githubusercontent.com/63759255/86528326-e5c47d00-bee1-11ea-95cc-2e56b8df17c3.png)
+
   
 ## 구현(github 소스 참고)
 
