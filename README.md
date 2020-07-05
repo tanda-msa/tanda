@@ -190,11 +190,11 @@ Vary: Access-Control-Request-Headers
 ```
 * 택시 배차요청 수신 확인
 ![배차됨2](https://user-images.githubusercontent.com/63759255/86531267-b8d09400-befa-11ea-877d-25581c1232a2.png)
-* 배차 완료
+* 배차 완료 확인
 ![배차중2](https://user-images.githubusercontent.com/63759255/86531268-ba01c100-befa-11ea-82d8-8f432ff3dcab.png)
-* 운행 시작
+* 운행 시작 확인
 ![운행시작2](https://user-images.githubusercontent.com/63759255/86531269-ba9a5780-befa-11ea-878d-c274c2310a2e.png)
-* 운행 종료
+* 운행 종료 확인
 ![운행완료2](https://user-images.githubusercontent.com/63759255/86531271-ba9a5780-befa-11ea-8f48-3e4793db79ed.png)
 * 결제확인
 ![페이처리2](https://user-images.githubusercontent.com/63759255/86531272-bb32ee00-befa-11ea-9c3b-bf1c290015f4.png)
@@ -227,6 +227,9 @@ Vary: Access-Control-Request-Headers
     "lastModifyTime": "2020-07-02T19:52:48.307"
 }
 ```
+* 취소처리 확인
+![취소처리1](https://user-images.githubusercontent.com/63759255/86531336-53c96e00-befb-11ea-8ea4-922cfbdec305.PNG)
+
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
 
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
