@@ -225,7 +225,39 @@ data:
   db-user: dGFuZGFjcXJzCg==
   db-pw: dGFuZGEyMDIwCg==
 ```
-
+#### skill set dependencies (pom.xml)
+##### H2 DB
+```yml
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+```
+##### Mysql DB
+```yml
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+```
+##### Lombok
+```yml
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+```
+##### openfeign
+```yml
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+```
+etc..
 
 ### 적용후 Test(AWS k8s 환경에서 시험)
 
