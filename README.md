@@ -55,26 +55,22 @@ Tanda(택시예약 시스템)
   2. 장애격리
      - 결제시스템(Sync연동)이 과중되면 Circuit breaker(FeignClient, Hystrix) 동작 및 운행종료(fallback)로 넘어가지 않는다.
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
-     - 구현(taxi 서비스)
-a. dependency 추가(pom.xml)
-      
+     - 구현(taxi 서비스)  
+  a. dependency 추가(pom.xml)
 ```
 <dependency>
 <groupId>org.springframework.cloud</groupId>
 <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
-```
-b. FeignClient Enabling(App.java)
-      
+```  
+   b. FeignClient Enabling(App.java)
 ```
 @SpringBootApplication
 @EnableBinding(Processor.class)
 @EnableFeignClients
 public class App {
-```
-
-c. FeignClient 인터페이스 생성(PayService.java)
-      
+```  
+   c. FeignClient 인터페이스 생성(PayService.java) 
 ```
 @FeignClient(name = "pay", url = "${api.url.pay}")
 public interface PayService {
@@ -82,9 +78,7 @@ public interface PayService {
 void billRelease(Pay pay);
 }
 ```
-
-d. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)
-      
+   d. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
 ```
 Pay pay = new Pay();
 pay.setBookId(f.getBookId()); 
