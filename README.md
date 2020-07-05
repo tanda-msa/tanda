@@ -79,7 +79,7 @@ Tanda(택시예약 시스템)
 
 * MSAEz 로 모델링한 이벤트스토밍 결과
 
-![이벤트설계0701_1](https://user-images.githubusercontent.com/63759255/86444126-440b2780-bd4b-11ea-8297-0d63293cb62c.png)
+![이벤트설계0701_1](https://user-images.githubusercontent.com/4962448/86513638-d0e6db80-be46-11ea-938a-13533e3812ba.png)
 
 ### 이벤트 도출 (액터, 커맨드, 폴리시)
 
