@@ -328,7 +328,7 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
-## Gateway를 외부에서 클러스터내 마이크로 서비스 API 호출 구현
+## Gateway를 통한 클러스터내 마이크로 서비스 API 호출 구현
 ```
 spring:
   profiles: docker
