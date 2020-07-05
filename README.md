@@ -364,7 +364,7 @@ spring:
               - "*"
             allowCredentials: true
 ```
-## 쿠버네티스 클러스터에 구축 내용
+## 쿠버네티스 클러스터 구축 
 * POD
 ```
 NAME                           READY   STATUS    RESTARTS   AGE
