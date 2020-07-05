@@ -75,15 +75,21 @@ Tanda(택시예약 시스템)
      - 예약 배차 관련 모든 상태 정보를 전달한다
      
 ## 분석/설계
-### Event Storming 결과
+
+### 이벤트 도출 (액터-노랑, 커맨드-파랑, 이벤트-빨강, 폴리시-초록)
+
+![이벤트스토밍](https://user-images.githubusercontent.com/63759255/86353291-fbe3fa80-bca1-11ea-9461-5f71c24e84ae.jpg)
+
+### 비기능 요구사항 적용
+
+
+
+### Event Storming 최종 결과
 
 * MSAEz 로 모델링한 이벤트스토밍 결과
 
 ![이벤트설계0701_1](https://user-images.githubusercontent.com/4962448/86513638-d0e6db80-be46-11ea-938a-13533e3812ba.png)
 
-### 이벤트 도출 (액터, 커맨드, 폴리시)
-
-![이벤트스토밍](https://user-images.githubusercontent.com/63759255/86353291-fbe3fa80-bca1-11ea-9461-5f71c24e84ae.jpg)
 
 ### 어그리게잇으로 묶기
 ```
@@ -99,15 +105,15 @@ Tanda(택시예약 시스템)
 스프링부트와 H2 DB(예약 서비스),MySQL(배차,CQRS 서비스) 및 Kafka 클러스트(공통)를 통해 AWS Cloud 상에 구현하였다.
 구현한 각 서비스에서 사용된 포트 정보는 아래와 같다. (각자의 포트넘버는 8081 ~ 808n 이다)
 로컬 PC 에서 구현한 소스를 빌드업하고 Dockerising 하여 AWS 클라우드의 Kubernetes 클러스트에 배포
-```
-# Book //port number: 8081
 
-# TaxiDeploy //port number: 8082
+| No | Service Name| Github Address | Port | Describe |
+| :--------: | :--------: | :--------: | :-------- | :-------- |
+| 1 | gateway | https://github.com/jamesby99/gateway.git | 80 | 게이트웨이 |
+| 2 | book | https://github.com/one7ime/book.git | 8081 | 예약서비스 |
+| 3 | taxi | https://github.com/choijuho/taxi.git | 8082 | 차량배차 서비스 |
+| 4 | pay | https://github.com/choijuho/taxi.git | 8083 | 결제서비스 |
+| 5 | cqrs | https://github.com/jamesby99/cqrs.git | 8084 | CQRS(VIEW) 서비스 |
 
-# Pay //port number: 8083
-
-# CQRS //port number: 8084
-```
 
 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다
 
