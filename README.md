@@ -107,9 +107,11 @@ Tanda(택시예약 시스템)
 ### DDD 의 적용
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 기능별로 대응되는 마이크로 서비스들을 
 예약(Book : H2 DB),배차(TaxiDispatch:MySQL), CQRS(CQRS : MySQL) 및 Kafka 클러스트(공통)를 통해 AWS Cloud 상에 구현하였다.
+
 Gateway는 Springboot Gateway 기반으로 구성하고 Pay 서비스는 외부 시스템으로 동작한다.
 구현한 각 서비스에서 사용된 포트 정보는 아래와 같다. (각자의 포트넘버는 8081 ~ 808n 이다)
-로컬 PC 에서 구현한 소스를 빌드업하고 github 소스와 연동하고 Dockerising 하여 AWS 클라우드의 Kubernetes 클러스트에 배포
+
+로컬 PC 에서 구현한 소스를 빌드업하고 github 소스와 연동하고 Dockerising 하여 AWS 클라우드의 Kubernetes 클러스트에 배포한다.
 
 | No | Service Name| Github Address | Port | Describe |
 | :--------: | :--------: | :--------: | :-------- | :-------- |
