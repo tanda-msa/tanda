@@ -88,7 +88,7 @@ Tanda(택시예약 시스템)
 
 * MSAEz 로 모델링한 이벤트스토밍 결과
 
-![이벤트설계0701_1](https://user-images.githubusercontent.com/4962448/86513638-d0e6db80-be46-11ea-938a-13533e3812ba.png)
+![이벤트설계0701_1](https://user-images.githubusercontent.com/63759255/86527629-e6f2ab80-bedb-11ea-94d4-96aa13d26c25.png)
 
 
 ### 어그리게잇으로 묶기
