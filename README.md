@@ -93,14 +93,6 @@ Tanda(택시예약 시스템)
   . General Domain : 결제  
 ```
 
-### 어그리게잇으로 묶기
-```
-  . Core Domain : 예약 , 차량관리
-  . Supporting Domain : CQRS
-  . General Domain : 결제
-```
--------------------------------------
-
 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다
 
 1. 예약 서비스 (Book)
@@ -160,7 +152,6 @@ public class Pay {
 }
 ```
 
-----------------------------------------------------------
 ### 헥사고날 다이어그램
 ![헥사고날 다이어그램2](https://user-images.githubusercontent.com/63759255/86530692-c6cfe600-bef5-11ea-8124-c9a75d0c2889.png)
 
