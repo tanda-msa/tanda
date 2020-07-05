@@ -627,7 +627,7 @@ data:
                name: cqrs-secret
                key: db-pw
 ```
-* 적용 applicaion.property (예: CQRS 일부 발췌)
+* 적용 applicaion. (예: CQRS 일부 발췌)
 ```
   datasource:
     url: jdbc:mysql://${_DATASOURCE_ADDRESS:localhost:3306}/${_DATASOURCE_TABLESPACE:db_tanda_cqrs}?autoReconnect=true&serverTimezone=JST
