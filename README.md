@@ -94,7 +94,7 @@ Tanda(택시예약 시스템)
 ```
 
 ### 헥사고날 다이어그램
-![헥사고날 다이어그램](https://user-images.githubusercontent.com/63759255/86528326-e5c47d00-bee1-11ea-95cc-2e56b8df17c3.png)
+![헥사고날 다이어그램2](https://user-images.githubusercontent.com/63759255/86530692-c6cfe600-bef5-11ea-8124-c9a75d0c2889.png)
 
   
 ## 구현(github 소스 참고)
