@@ -59,9 +59,6 @@ Tanda(택시예약 시스템)
      - 서포트 기능(CPQR) 이 수행되지 않더라도 차량 요청 및 배차는 365일 24시간 받을 수 있어야 한다      Async (event-driven), Eventual Consistency
      - 가용한 차량이 없으면 사용자를 잠시동안 받지 않고 잠시후에 호출하도록 유도 (circuit breaker)
      - 차량운행 상태의 변경시 알림을 준다 (Event driven)
-        1. 배차(비가용)
-        2. 운행시작(비가용)
-        3. 운행종료(가용)
   4. 기타
      - 결제(Sync) 외 비동기
    
