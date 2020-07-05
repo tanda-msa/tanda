@@ -31,7 +31,6 @@ Tanda(택시예약 시스템)
  
  
  ## 소스코드
-<<<<<<< HEAD
   | No | Service Name| Github Address |
   | :--------: | :--------: | :--------: |
   | 0 | Readme | https://github.com/tanda-msa/tanda |
@@ -40,9 +39,7 @@ Tanda(택시예약 시스템)
   | 3 | taxi | https://github.com/choijuho/taxi.git | 8082 | 
   | 4 | pay | https://github.com/choijuho/taxi.git | 8083 | 
   | 5 | cqrs | https://github.com/jamesby99/cqrs.git | 8084 | 
-=======
-  https://github.com/tanda-msa
->>>>>>> 0482824ea84037d9d999698dc4db9180d8bd1a34
+
  
  ## 서비스 시나리오
  
@@ -81,8 +78,11 @@ Tanda(택시예약 시스템)
      - 모든 요청에 대해 1분이내 배차/재요청 응답한다.
 
  3. CORS
-     - 예약 배차 관련 모든 상태 정보를 전달한다
-     
+     - 예약 배차 관련 모든 상태 정보를 전달한다.
+  
+#### 사용자 UI (예상 Sample)
+  ![Taxi 호출 UI](https://user-images.githubusercontent.com/63759255/86532481-487b4000-bf05-11ea-968c-ab934e3b1c55.png)
+
 ## 분석/설계
 
 ### 이벤트 도출 (액터-노랑, 커맨드-파랑, 이벤트-빨강, 폴리시-초록)
