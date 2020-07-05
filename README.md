@@ -70,7 +70,7 @@ Tanda(택시예약 시스템)
 @EnableFeignClients
 public class App {
 ```    
-     3. FeignClient 인터페이스 생성(PayService.java) 
+    3. FeignClient 인터페이스 생성(PayService.java) 
 ```java
 @FeignClient(name = "pay", url = "${api.url.pay}")
 public interface PayService {
@@ -78,7 +78,7 @@ public interface PayService {
 void billRelease(Pay pay);
 }
 ```    
-     4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
+    4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
 ```java
 Pay pay = new Pay();
 pay.setBookId(f.getBookId()); 
