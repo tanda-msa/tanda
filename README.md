@@ -81,7 +81,7 @@ Tanda(택시예약 시스템)
      - 예약 배차 관련 모든 상태 정보를 전달한다.
   
 #### 사용자 UI (예상 Sample)
-  ![Taxi 호출 UI2](https://user-images.githubusercontent.com/63759255/86532755-41553180-bf07-11ea-9fe4-3a4f022965a9.png)
+  ![Taxi 호출 UI3](https://user-images.githubusercontent.com/63759255/86532850-ef60db80-bf07-11ea-9508-dfe82f9bb8b9.jpg)
 
 ## 분석/설계
 
