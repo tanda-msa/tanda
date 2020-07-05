@@ -165,7 +165,7 @@ payService.billRelease(pay);
 ### 적용후 Test(Sample)
 
 * 예약서비스에서 예약요청
-```xml
+```
 http http://localhost:8081/books customerInfo="손흥민/010-1122-0015/1111-2222-3333-0015" departmentLoc="여의도" arrivalLoc="상도동" 
 Connection: keep-alive
 Content-Type: application/json
