@@ -127,21 +127,21 @@ Tanda(택시예약 시스템)
    ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
 ### Feign Client 구현(비기능요구사항-2 장애격리)  
-####1. dependency 추가(pom.xml)
+#### 1. dependency 추가(pom.xml)
 ```xml
 <dependency>
 <groupId>org.springframework.cloud</groupId>
 <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
  ```    
-####2. FeignClient Enabling(App.java)
+#### 2. FeignClient Enabling(App.java)
 ```java
 @SpringBootApplication
 @EnableBinding(Processor.class)
 @EnableFeignClients
 public class App {
 ```    
-####3. FeignClient 인터페이스 생성(PayService.java) 
+#### 3. FeignClient 인터페이스 생성(PayService.java) 
 ```java
 @FeignClient(name = "pay", url = "${api.url.pay}")
 public interface PayService {
@@ -149,7 +149,7 @@ public interface PayService {
 void billRelease(Pay pay);
 }
 ```    
-####4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
+#### 4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
 ```java
 Pay pay = new Pay();
 pay.setBookId(f.getBookId()); 
