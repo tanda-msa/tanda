@@ -216,7 +216,7 @@ payService.billRelease(pay);
     throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
 }
 ```
-### 적용후 Test(AWS)
+### 적용후 Test(AWS k8s 환경에서 시험)
 
 * 예약서비스에서 예약요청
 ![택시요청](https://user-images.githubusercontent.com/63759255/86531256-a35b6a00-befa-11ea-9a91-0b4613d1cc4d.png)
