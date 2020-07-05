@@ -244,6 +244,7 @@ payService.billRelease(pay);
 * 예약서비스에서 고객발 취소 요청
 ![택시취소](https://user-images.githubusercontent.com/63759255/86531266-b79f6700-befa-11ea-8a1c-01e96a16c9c3.png)
 ![택시요청db2](https://user-images.githubusercontent.com/63759255/86531259-ab1b0e80-befa-11ea-83b4-d493ae9547f0.png)
+![택시취소DB](https://user-images.githubusercontent.com/63759255/86531821-79587680-beff-11ea-87fd-185e74690eb2.png)
 
 <<<<<<< HEAD
 =======
