@@ -613,7 +613,7 @@ Longest transaction:           31.06
 Shortest transaction:           0.00
 ```
 ### Configmap과 Secret 반영
-모든 마이크로서비스에는 Configmap를 구성하여 외부 주입에 의한 Pod운영의 유연성을 확보하였다.
+모든 마이크로서비스에는 Configmap과 Secret를 구성하여 외부 주입에 의한 Pod운영의 유연성을 확보하였다.
 * DB주소와 Table스페이스 ConfigMap 예
 ```
 apiVersion: v1
