@@ -120,10 +120,10 @@ Tanda(택시예약 시스템)
 
 ![업무 프로세스 흐름도 ](https://user-images.githubusercontent.com/63759255/86529658-5755f880-beed-11ea-94a0-dd9e516a10d4.png)
 
-### SagaPatter 적용(비기능요구사항-1 트랜젝션 )
+### SagaPatter 적용(비기능요구사항-1,3 트랜젝션 )
    ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
 
-### Feign Client 구현(비기능요구사항-2 장애격리)  
+### Feign Client 구현(비기능요구사항-2,3 장애격리)  
 #### 1. dependency 추가(pom.xml)
 ```xml
 <dependency>
