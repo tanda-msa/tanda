@@ -224,7 +224,7 @@ data:
 
 * 택시 배차요청 수신 확인
 ![배차됨2](https://user-images.githubusercontent.com/63759255/86531267-b8d09400-befa-11ea-877d-25581c1232a2.png)
-* 배차 완료 확인
+* 배차 완료 확인  
 ![배차중2](https://user-images.githubusercontent.com/63759255/86531268-ba01c100-befa-11ea-82d8-8f432ff3dcab.png)
 * 운행 시작 확인
 ![운행시작2](https://user-images.githubusercontent.com/63759255/86531269-ba9a5780-befa-11ea-878d-c274c2310a2e.png)
