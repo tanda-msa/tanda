@@ -51,6 +51,7 @@ Tanda(택시예약 시스템)
  
   1. 트랜잭션
    고객 배차 취소 요청은 비동기 방식이나, Saga Pattern을 적용하여 최종 일관성을 유지한다.  
+   ![비기능요구사항1](https://user-images.githubusercontent.com/63759255/86529261-48217b80-beea-11ea-8e3b-bfdd3b31d7ef.png)
   2. 장애격리
      - 결제시스템(Sync연동)이 과중되면 Circuit breaker(FeignClient, Hystrix) 동작 및 운행종료(fallback)로 넘어가지 않는다.
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
@@ -79,9 +80,6 @@ Tanda(택시예약 시스템)
 ### 이벤트 도출 (액터-노랑, 커맨드-파랑, 이벤트-빨강, 폴리시-초록)
 
 ![이벤트스토밍](https://user-images.githubusercontent.com/63759255/86353291-fbe3fa80-bca1-11ea-9461-5f71c24e84ae.jpg)
-
-### 비기능 요구사항 적용
-
 
 
 ### Event Storming 최종 결과
