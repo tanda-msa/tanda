@@ -133,8 +133,6 @@ Tanda(택시예약 시스템)
  ```    
 #### 2. FeignClient Enabling(App.java)
 ```java
-@SpringBootApplication
-@EnableBinding(Processor.class)
 @EnableFeignClients
 public class App {
 ```    
