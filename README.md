@@ -288,6 +288,9 @@ etc..
 ![kakao](https://user-images.githubusercontent.com/63759255/86531660-23370380-befe-11ea-9069-788f0fc61d95.PNG)
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
+* CQRS 프로젝션 예시
+[](url)
+![CQRS](https://user-images.githubusercontent.com/63759255/86534772-21793a00-bf16-11ea-9646-fe166cbaa8bc.png)
 
 ### 동기식 호출 / 장애격리 / Eventual Consistency
 #### Saga Patter 적용(비기능요구사항-1,3 트랜젝션 )
