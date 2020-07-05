@@ -33,7 +33,7 @@ Tanda(택시예약 시스템)
  ## 소스코드
   | No | Service Name| Github Address |
   | :--------: | :--------: | :--------: |
-  | 0 | Readme | https://github.com/tanda-msa |
+  | 0 | Readme | https://github.com/tanda-msa/tanda |
   | 1 | gateway | https://github.com/jamesby99/gateway.git | 
   | 2 | book | https://github.com/one7ime/book.git | 8081 | 
   | 3 | taxi | https://github.com/choijuho/taxi.git | 8082 | 
