@@ -105,13 +105,10 @@ Tanda(택시예약 시스템)
 ## 구현(github 소스 참고)
 
 ### DDD 의 적용
-분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 기능별로 대응되는 마이크로 서비스들을 
-예약(Book : H2 DB),배차(TaxiDispatch:MySQL), CQRS(CQRS : MySQL) 및 Kafka 클러스트(공통)를 통해 AWS Cloud 상에 구현하였다.
-
-Gateway는 Springboot Gateway 기반으로 구성하고 Pay 서비스는 외부 시스템으로 동작한다.
+분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 
+스프링부트와 H2 DB(예약 서비스),MySQL(배차,CQRS 서비스) 및 Kafka 클러스트(공통)를 통해 AWS Cloud 상에 구현하였다.
 구현한 각 서비스에서 사용된 포트 정보는 아래와 같다. (각자의 포트넘버는 8081 ~ 808n 이다)
-
-로컬 PC 에서 구현한 소스를 빌드업하고 github 소스와 연동하고 Dockerising 하여 AWS 클라우드의 Kubernetes 클러스트에 배포한다.
+로컬 PC 에서 구현한 소스를 빌드업하고 Dockerising 하여 AWS 클라우드의 Kubernetes 클러스트에 배포
 
 | No | Service Name| Github Address | Port | Describe |
 | :--------: | :--------: | :--------: | :-------- | :-------- |
@@ -123,10 +120,6 @@ Gateway는 Springboot Gateway 기반으로 구성하고 Pay 서비스는 외부 
 
 
 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다
-
-### 업무 프로세스 흐름도
- 
-작성 중
 
 
 ### 적용후 Test(Sample)
@@ -160,7 +153,184 @@ Vary: Access-Control-Request-Headers
     "lastModifyTime": "2020-07-02T19:59:25.509"
 }
 ```
+* 택시 배차요청 수신 확인
+```
+http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi
+{
+  "_embedded" : {
+    "taxiDispatches" : [ {
+      "bookId" : 1,
+      "taxiInfo" : null,
+      "dispatchStatus" : "배차중",
+      "price" : 0,
+      "lastModifyTime" : "2020-07-05T17:14:40.831",
+      "_links" : {
+        "self" : {
+          "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        },
+        "taxiDispatch" : {
+          "href" : "a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
+    },
+    "profile" : {
+      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
+    },
+    "search" : {
+      "href" : "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi"
+    }
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
+```
+* 배차 완료
+```
+http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 taxiInfo="30우8281/010-0000-0000" dispatchStatus="배차됨"
 
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Sun, 05 Jul 2020 08:26:07 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_links": {
+        "self": {
+            "href": "http://http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        },
+        "taxiDispatch": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        }
+    },
+    "bookId": 1,
+    "dispatchStatus": "배차됨",
+    "lastModifyTime": "2020-07-05T17:26:07.538",
+    "price": 0,
+    "taxiInfo": "30우8281/010-0000-0000"
+}
+```
+* 운행 시작
+```
+http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행시작됨"
+
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Sun, 05 Jul 2020 08:30:40 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_links": {
+        "self": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        },
+        "taxiDispatch": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        }
+    },
+    "bookId": 1,
+    "dispatchStatus": "운행시작됨",
+    "lastModifyTime": "2020-07-05T17:30:40.027",
+    "price": 0,
+    "taxiInfo": "30우8281/010-0000-0000"
+}
+```
+* 운행 종료
+```
+http PATCH http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1 dispatchStatus="운행종료됨"
+
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Sun, 05 Jul 2020 08:33:53 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_links": {
+        "self": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        },
+        "taxiDispatch": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi/1"
+        }
+    },
+    "bookId": 1,
+    "dispatchStatus": "운행종료됨",
+    "lastModifyTime": "2020-07-05T17:33:53.939",
+    "price": 5000,
+    "taxiInfo": "30우8281/010-0000-0000"
+}
+```
+* 결제확인
+```
+http http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/hal+json
+Date: Sun, 05 Jul 2020 08:45:16 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+
+{
+    "_embedded": {
+        "pays": [
+            {
+                "_links": {
+                    "pay": {
+                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
+                    },
+                    "self": {
+                        "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay/2"
+                    }
+                },
+                "bookId": 1,
+                "dispatchId": 1,
+                "lastModifyTime": "2020-07-05T17:42:30.845",
+                "price": 5000
+            }
+        ]
+    },
+    "_links": {
+        "profile": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
+        },
+        "self": {
+            "href": "http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/pay"
+        }
+    },
+    "page": {
+        "number": 0,
+        "size": 20,
+        "totalElements": 1,
+        "totalPages": 1
+    }
+}
+```
 * 예약서비스에서 고객발 취소 요청
 ```
 http patch localhost:8081/books/3 bookStatus="고객발 취소됨"
