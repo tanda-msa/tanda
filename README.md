@@ -62,14 +62,14 @@ Tanda(택시예약 시스템)
 <groupId>org.springframework.cloud</groupId>
 <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
-```  
+```    
    b. FeignClient Enabling(App.java)
 ```
 @SpringBootApplication
 @EnableBinding(Processor.class)
 @EnableFeignClients
 public class App {
-```  
+```    
    c. FeignClient 인터페이스 생성(PayService.java) 
 ```
 @FeignClient(name = "pay", url = "${api.url.pay}")
@@ -77,7 +77,7 @@ public interface PayService {
 @RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
 void billRelease(Pay pay);
 }
-```
+```    
    d. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
 ```
 Pay pay = new Pay();
