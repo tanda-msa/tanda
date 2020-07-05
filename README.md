@@ -57,40 +57,40 @@ Tanda(택시예약 시스템)
      - 요금 결제가 되지 않으면 운행종료로 넘어가지 않는다 (sync호출)
      - 구현(taxi 서비스)  
      1. dependency 추가(pom.xml)
-  ```xml
-  <dependency>
-  <groupId>org.springframework.cloud</groupId>
-  <artifactId>spring-cloud-starter-openfeign</artifactId>
-  </dependency>
-  ```    
+```xml
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+ ```    
      2. FeignClient Enabling(App.java)
-  ```java
-  @SpringBootApplication
-  @EnableBinding(Processor.class)
-  @EnableFeignClients
-  public class App {
-  ```    
+```java
+@SpringBootApplication
+@EnableBinding(Processor.class)
+@EnableFeignClients
+public class App {
+```    
      3. FeignClient 인터페이스 생성(PayService.java) 
-  ```java
-  @FeignClient(name = "pay", url = "${api.url.pay}")
-  public interface PayService {
-  @RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
-  void billRelease(Pay pay);
-  }
-  ```    
+```java
+@FeignClient(name = "pay", url = "${api.url.pay}")
+public interface PayService {
+@RequestMapping(method = RequestMethod.POST, path = "/pays", consumes = "application/json")
+void billRelease(Pay pay);
+}
+```    
      4. @PreUpdate (결제완료처리 전) 결제모듈 실행(TaxiDispatch.java)   
-  ```java
-  Pay pay = new Pay();
-  pay.setBookId(f.getBookId()); 
-  pay.setDispatchId(f.getDispatchId());
-  pay.setPrice(this.getPrice()); 
-  try {
-  PayService payService = App.applicationContext.getBean(PayService.class);
-  payService.billRelease(pay);					
-  } catch (Exception e) {
-      throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
-  }
-  ```
+```java
+Pay pay = new Pay();
+pay.setBookId(f.getBookId()); 
+pay.setDispatchId(f.getDispatchId());
+pay.setPrice(this.getPrice()); 
+try {
+PayService payService = App.applicationContext.getBean(PayService.class);
+payService.billRelease(pay);					
+} catch (Exception e) {
+    throw new RuntimeException(String.format("결제실패가 실패했습니다(%s)\n%s", this, e.getMessage()));
+}
+```
 
   3. 성능 
      - 서포트 기능(CPQR) 이 수행되지 않더라도 차량 요청 및 배차는 365일 24시간 받을 수 있어야 한다      Async (event-driven), Eventual Consistency
