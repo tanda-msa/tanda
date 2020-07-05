@@ -133,6 +133,74 @@ payService.billRelease(pay);
   . General Domain : 결제  
 ```
 
+### 어그리게잇으로 묶기
+```
+  . Core Domain : 예약 , 차량관리
+  . Supporting Domain : CQRS
+  . General Domain : 결제
+```
+-------------------------------------
+
+각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다
+
+1. 예약 서비스 (Book)
+```
+public class Book {
+	private Long bookId; // ID : 자동생성
+	private String customerInfo; // 고객정보 : "유병전/전화번호/카드번호"
+	private String departmentLoc; // 출발지 : 분당KT본사
+	private String arrivalLoc; // 도착지 : 강남역
+	private String bookStatus; // 둘중 하나 : 접수,취소(고객),취소(시스템)
+	private LocalDateTime lastModifyTime; // DB INSERT, UPDATE Time으로 @PreUpate Hook에서 셋팅
+	private boolean confirmed = false; 
+}
+```
+
+2. 차량 관리 서비스 (TaxiDispatch)
+```
+public class TaxiDispatch {
+	private Long dispatchId; // ID : 자동생성
+	private Long bookId; // Book Entity와 relation
+	private String taxiInfo; // 배차된 택시정보 : 차번호/전화번호
+	private String dispatchStatus; // 배차됨, 운행시작됨, 운행종료됨, 배차취소됨
+	private int price; //운행종료후 API로 전달됨
+	private LocalDateTime lastModifyTime; // DB INSERT, UPDATE Time으로 @PreUpate Hook에서 셋팅
+```
+
+3. CQRS 서비스 (CQRS)
+```
+public class Kakao {
+private Long kakaoId;					//ID 	: 자동생성
+	private Long bookId;					//Book Entity와 relation
+	private String receiver;				//customerInfo or taxiInfo
+	private String msg;
+	private LocalDateTime lastModifyTime;	//DB INSERT, UPDATE Time으로 @PreUpate Hook에서 셋팅 
+}
+public class RideHistory {		
+	private Long bookId;					//entity ID
+	private Long dispatchId;				
+	private String customerInfo;			//고객정보 : "유병전/전화번호"
+	private String departmentLoc;			//출발지	: 분당KT본사
+	private String arrivalLoc;				//도착지	: 강남역
+	private String taxiInfo;				//배차된 택시정보 : 차번호/전화번호
+	private String bookStatus;				//둘중 하나 : 접수,취소
+	private String dispatchStatus;			//배차됨, 운행시작됨, 운행종료됨, 배차취소됨
+	private int price;						//결제된 택시요금
+	private LocalDateTime lastModifyTime;	//DB INSERT, UPDATE Time으로 @PreUpate Hook에서 셋팅 
+}
+```
+
+4. 결제 서비스 (Pay)
+```
+public class Pay {		
+	private Long payId;						//ID 	: 자동생성
+	private Long bookId;					//Book Entity와 relation
+	private Long dispatchId;				//Dispatch Entity와 relation
+	private int	 price;						//결제된 택시요금
+}
+```
+
+----------------------------------------------------------
 ### 헥사고날 다이어그램
 ![헥사고날 다이어그램](https://user-images.githubusercontent.com/63759255/86528326-e5c47d00-bee1-11ea-95cc-2e56b8df17c3.png)
 
@@ -164,34 +232,9 @@ payService.billRelease(pay);
 ### 적용후 Test(Sample)
 
 * 예약서비스에서 예약요청
-```
-http http://localhost:8081/books customerInfo="손흥민/010-1122-0015/1111-2222-3333-0015" departmentLoc="여의도" arrivalLoc="상도동" 
-Connection: keep-alive
-Content-Type: application/json
-Date: Thu, 02 Jul 2020 10:59:25 GMT
-Keep-Alive: timeout=60
-Location: http://localhost:8081/books/6
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+![택시요청](https://user-images.githubusercontent.com/63759255/86531256-a35b6a00-befa-11ea-9a91-0b4613d1cc4d.png)
+![택시요청db1](https://user-images.githubusercontent.com/63759255/86531307-12d15980-befb-11ea-8eb5-2f801722fbf4.png)
 
-{
-    "_links": {
-        "book": {
-            "href": "http://localhost:8081/books/6"
-        },
-        "self": {
-            "href": "http://localhost:8081/books/6"
-        }
-    },
-    "arrivalLoc": "상도동",
-    "bookStatus": "접수됨",
-    "customerInfo": "손흥민/010-1122-0005/1111-2222-3333-0005",
-    "departmentLoc": "여의도",
-    "lastModifyTime": "2020-07-02T19:59:25.509"
-}
-```
 * 택시 배차요청 수신 확인
 ```
 http://a41dcd284d4994f898ece7716a77ab39-1598962157.ap-northeast-1.elb.amazonaws.com/taxi
@@ -371,34 +414,9 @@ Vary: Access-Control-Request-Headers
 }
 ```
 * 예약서비스에서 고객발 취소 요청
-```
-http patch localhost:8081/books/3 bookStatus="고객발 취소됨"
-HTTP/1.1 200
-Connection: keep-alive
-Content-Type: application/json
-Date: Thu, 02 Jul 2020 10:52:48 GMT
-Keep-Alive: timeout=60
-Transfer-Encoding: chunked
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
+![택시취소](https://user-images.githubusercontent.com/63759255/86531266-b79f6700-befa-11ea-8a1c-01e96a16c9c3.png)
+![택시요청db2](https://user-images.githubusercontent.com/63759255/86531259-ab1b0e80-befa-11ea-83b4-d493ae9547f0.png)
 
-{
-    "_links": {
-        "book": {
-            "href": "http://localhost:8081/books/3"
-        },
-        "self": {
-            "href": "http://localhost:8081/books/3"
-        }
-    },
-    "arrivalLoc": "마포2",
-    "bookStatus": "고객발 취소됨",
-    "customerInfo": "홍길동/010-2233-0002/1111-2222-3333-0002",
-    "departmentLoc": "김포",
-    "lastModifyTime": "2020-07-02T19:52:48.307"
-}
-```
 * 각 서비스에서 메세지 Pub/Sub 전송 확인
 
 ![kafka test2](https://user-images.githubusercontent.com/63759255/86353866-f0450380-bca2-11ea-9bbf-da248b5f5fc0.png)
