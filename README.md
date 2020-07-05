@@ -124,6 +124,10 @@ Gateway는 Springboot Gateway 기반으로 구성하고 Pay 서비스는 외부 
 
 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다
 
+### 업무 프로세스 흐름도
+ 
+작성 중
+
 
 ### 적용후 Test(Sample)
 
